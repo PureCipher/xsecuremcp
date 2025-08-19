@@ -1,0 +1,3 @@
+fastmcp@git+https://github.com/jlowin/fastmcp.git
+phue2
+

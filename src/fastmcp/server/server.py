@@ -14,7 +14,7 @@ from contextlib import (
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Generic, Literal, cast, overload
+from typing import TYPE_CHECKING, Any, Generic, Literal, Optional, cast, overload
 
 import anyio
 import httpx
@@ -62,6 +62,7 @@ from fastmcp.settings import Settings
 from fastmcp.tools import ToolManager
 from fastmcp.tools.tool import FunctionTool, Tool, ToolResult
 from fastmcp.tools.tool_transform import ToolTransformConfig
+from fastmcp.policy import PolicyEngine
 from fastmcp.utilities.cli import log_server_banner
 from fastmcp.utilities.components import FastMCPComponent
 from fastmcp.utilities.logging import get_logger
@@ -173,6 +174,7 @@ class FastMCP(Generic[LifespanResultT]):
 
         self._additional_http_routes: list[BaseRoute] = []
         self._mounted_servers: list[MountedServer] = []
+        self._policy_engine: Optional[PolicyEngine] = None
         self._tool_manager = ToolManager(
             duplicate_behavior=on_duplicate_tools,
             mask_error_details=mask_error_details,
@@ -487,12 +489,43 @@ class FastMCP(Generic[LifespanResultT]):
         """
         routes = list(self._additional_http_routes)
 
+        # Add policy evaluation endpoint if policy engine is configured
+        if self._policy_engine is not None:
+            from fastmcp.server.policy_routes import create_policy_evaluate_route
+            
+            policy_route = create_policy_evaluate_route(self._policy_engine)
+            routes.append(policy_route)
+
         # Recursively get routes from mounted servers
         for mounted_server in self._mounted_servers:
             mounted_routes = mounted_server.server._get_additional_http_routes()
             routes.extend(mounted_routes)
 
         return routes
+    
+    def enable_policy_engine(self, policy_engine: Optional[PolicyEngine] = None) -> PolicyEngine:
+        """Enable the policy engine for this server.
+        
+        Args:
+            policy_engine: Optional policy engine instance. If None, creates a new one.
+            
+        Returns:
+            The policy engine instance
+        """
+        if policy_engine is None:
+            policy_engine = PolicyEngine()
+        
+        self._policy_engine = policy_engine
+        logger.info("Policy engine enabled for server")
+        return policy_engine
+    
+    def get_policy_engine(self) -> Optional[PolicyEngine]:
+        """Get the policy engine instance.
+        
+        Returns:
+            The policy engine instance, or None if not enabled
+        """
+        return self._policy_engine
 
     async def _mcp_list_tools(self) -> list[MCPTool]:
         logger.debug("Handler called: list_tools")
