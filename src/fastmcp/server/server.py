@@ -64,6 +64,7 @@ from fastmcp.tools import ToolManager
 from fastmcp.tools.tool import FunctionTool, Tool, ToolResult
 from fastmcp.tools.tool_transform import ToolTransformConfig
 from fastmcp.policy import PolicyEngine
+from fastmcp.ledger import ProvenanceLedger
 from fastmcp.utilities.cli import log_server_banner
 from fastmcp.utilities.components import FastMCPComponent
 from fastmcp.utilities.logging import get_logger
@@ -176,6 +177,7 @@ class FastMCP(Generic[LifespanResultT]):
         self._additional_http_routes: list[BaseRoute] = []
         self._mounted_servers: list[MountedServer] = []
         self._policy_engine: Optional[PolicyEngine] = None
+        self._ledger: Optional[ProvenanceLedger] = None
         self._tool_manager = ToolManager(
             duplicate_behavior=on_duplicate_tools,
             mask_error_details=mask_error_details,
@@ -514,6 +516,13 @@ class FastMCP(Generic[LifespanResultT]):
             policy_route = create_policy_evaluate_route(self._policy_engine)
             routes.append(policy_route)
 
+        # Add ledger management endpoints if ledger is configured
+        if self._ledger is not None:
+            from fastmcp.server.ledger_routes import create_ledger_routes
+            
+            ledger_routes = create_ledger_routes(self._ledger)
+            routes.extend(ledger_routes)
+
         # Recursively get routes from mounted servers
         for mounted_server in self._mounted_servers:
             mounted_routes = mounted_server.server._get_additional_http_routes()
@@ -544,6 +553,31 @@ class FastMCP(Generic[LifespanResultT]):
             The policy engine instance, or None if not enabled
         """
         return self._policy_engine
+    
+    def enable_ledger(self, ledger: Optional[ProvenanceLedger] = None, database_url: str = "sqlite:///ledger.db") -> ProvenanceLedger:
+        """Enable the provenance ledger for this server.
+        
+        Args:
+            ledger: Optional ledger instance. If None, creates a new one.
+            database_url: Database URL for ledger persistence
+            
+        Returns:
+            The ledger instance
+        """
+        if ledger is None:
+            ledger = ProvenanceLedger(database_url)
+        
+        self._ledger = ledger
+        logger.info("Provenance ledger enabled for server")
+        return ledger
+    
+    def get_ledger(self) -> Optional[ProvenanceLedger]:
+        """Get the provenance ledger instance.
+        
+        Returns:
+            The ledger instance, or None if not enabled
+        """
+        return self._ledger
 
     async def _mcp_list_tools(self) -> list[MCPTool]:
         logger.debug("Handler called: list_tools")
