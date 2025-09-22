@@ -64,6 +64,7 @@ from fastmcp.tools import ToolManager
 from fastmcp.tools.tool import FunctionTool, Tool, ToolResult
 from fastmcp.tools.tool_transform import ToolTransformConfig
 from fastmcp.policy import PolicyEngine
+from fastmcp.reflexive import ReflexiveEngine
 from fastmcp.ledger import ProvenanceLedger
 from fastmcp.contracts import ContractEngine
 from fastmcp.utilities.cli import log_server_banner
@@ -178,6 +179,7 @@ class FastMCP(Generic[LifespanResultT]):
         self._additional_http_routes: list[BaseRoute] = []
         self._mounted_servers: list[MountedServer] = []
         self._policy_engine: Optional[PolicyEngine] = None
+        self._reflexive_engine: Optional[ReflexiveEngine] = None
         self._ledger: Optional[ProvenanceLedger] = None
         self._contract_engine: Optional[ContractEngine] = None
         self._tool_manager = ToolManager(
@@ -518,6 +520,13 @@ class FastMCP(Generic[LifespanResultT]):
             policy_route = create_policy_evaluate_route(self._policy_engine)
             routes.append(policy_route)
 
+        # Add reflexive core endpoints if reflexive engine is configured
+        if self._reflexive_engine is not None:
+            from fastmcp.server.reflexive_routes import create_reflexive_routes
+            
+            reflexive_routes = create_reflexive_routes(self._reflexive_engine)
+            routes.extend(reflexive_routes)
+  
         # Add ledger management endpoints if ledger is configured
         if self._ledger is not None:
             from fastmcp.server.ledger_routes import create_ledger_routes
@@ -612,6 +621,34 @@ class FastMCP(Generic[LifespanResultT]):
             The contract engine instance, or None if not enabled
         """
         return self._contract_engine
+
+
+    def enable_reflexive_core(self, reflexive_engine: Optional[ReflexiveEngine] = None) -> ReflexiveEngine:
+        """Enable the reflexive core for this server.
+        
+        Args:
+            reflexive_engine: Optional reflexive engine instance. If None, creates a new one.
+            
+        Returns:
+            The reflexive engine instance
+        """
+        if reflexive_engine is None:
+            reflexive_engine = ReflexiveEngine(
+                policy_engine=self._policy_engine,
+                ledger=None
+            )
+        
+        self._reflexive_engine = reflexive_engine
+        logger.info("Reflexive core enabled for server")
+        return reflexive_engine
+
+    def get_reflexive_engine(self) -> Optional[ReflexiveEngine]:
+        """Get the reflexive engine instance.
+        
+        Returns:
+            The reflexive engine instance, or None if not enabled
+        """
+        return self._reflexive_engine
 
     async def _mcp_list_tools(self) -> list[MCPTool]:
         logger.debug("Handler called: list_tools")
