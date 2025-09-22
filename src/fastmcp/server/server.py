@@ -64,6 +64,7 @@ from fastmcp.tools import ToolManager
 from fastmcp.tools.tool import FunctionTool, Tool, ToolResult
 from fastmcp.tools.tool_transform import ToolTransformConfig
 from fastmcp.policy import PolicyEngine
+from fastmcp.ledger import ProvenanceLedger
 from fastmcp.contracts import ContractEngine
 from fastmcp.utilities.cli import log_server_banner
 from fastmcp.utilities.components import FastMCPComponent
@@ -177,6 +178,7 @@ class FastMCP(Generic[LifespanResultT]):
         self._additional_http_routes: list[BaseRoute] = []
         self._mounted_servers: list[MountedServer] = []
         self._policy_engine: Optional[PolicyEngine] = None
+        self._ledger: Optional[ProvenanceLedger] = None
         self._contract_engine: Optional[ContractEngine] = None
         self._tool_manager = ToolManager(
             duplicate_behavior=on_duplicate_tools,
@@ -516,6 +518,13 @@ class FastMCP(Generic[LifespanResultT]):
             policy_route = create_policy_evaluate_route(self._policy_engine)
             routes.append(policy_route)
 
+        # Add ledger management endpoints if ledger is configured
+        if self._ledger is not None:
+            from fastmcp.server.ledger_routes import create_ledger_routes
+            
+            ledger_routes = create_ledger_routes(self._ledger)
+            routes.extend(ledger_routes)
+            
         # Add contract management endpoints if contract engine is configured
         if self._contract_engine is not None:
             from fastmcp.server.contract_routes import create_contract_routes
@@ -554,6 +563,31 @@ class FastMCP(Generic[LifespanResultT]):
         """
         return self._policy_engine
     
+    def enable_ledger(self, ledger: Optional[ProvenanceLedger] = None, database_url: str = "sqlite:///ledger.db") -> ProvenanceLedger:
+        """Enable the provenance ledger for this server.
+        
+        Args:
+            ledger: Optional ledger instance. If None, creates a new one.
+            database_url: Database URL for ledger persistence
+            
+        Returns:
+            The ledger instance
+        """
+        if ledger is None:
+            ledger = ProvenanceLedger(database_url)
+        
+        self._ledger = ledger
+        logger.info("Provenance ledger enabled for server")
+        return ledger
+    
+    def get_ledger(self) -> Optional[ProvenanceLedger]:
+        """Get the provenance ledger instance.
+        
+        Returns:
+            The ledger instance, or None if not enabled
+        """
+        return self._ledger
+
     def enable_contract_engine(self, contract_engine: Optional[ContractEngine] = None, database_url: str = "sqlite:///contracts.db") -> ContractEngine:
         """Enable the contract engine for this server.
         
