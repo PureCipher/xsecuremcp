@@ -65,6 +65,7 @@ from fastmcp.tools.tool import FunctionTool, Tool, ToolResult
 from fastmcp.tools.tool_transform import ToolTransformConfig
 from fastmcp.policy import PolicyEngine
 from fastmcp.ledger import ProvenanceLedger
+from fastmcp.contracts import ContractEngine
 from fastmcp.utilities.cli import log_server_banner
 from fastmcp.utilities.components import FastMCPComponent
 from fastmcp.utilities.logging import get_logger
@@ -178,6 +179,7 @@ class FastMCP(Generic[LifespanResultT]):
         self._mounted_servers: list[MountedServer] = []
         self._policy_engine: Optional[PolicyEngine] = None
         self._ledger: Optional[ProvenanceLedger] = None
+        self._contract_engine: Optional[ContractEngine] = None
         self._tool_manager = ToolManager(
             duplicate_behavior=on_duplicate_tools,
             mask_error_details=mask_error_details,
@@ -522,6 +524,13 @@ class FastMCP(Generic[LifespanResultT]):
             
             ledger_routes = create_ledger_routes(self._ledger)
             routes.extend(ledger_routes)
+            
+        # Add contract management endpoints if contract engine is configured
+        if self._contract_engine is not None:
+            from fastmcp.server.contract_routes import create_contract_routes
+            
+            contract_routes = create_contract_routes(self._contract_engine)
+            routes.extend(contract_routes)
 
         # Recursively get routes from mounted servers
         for mounted_server in self._mounted_servers:
@@ -578,6 +587,31 @@ class FastMCP(Generic[LifespanResultT]):
             The ledger instance, or None if not enabled
         """
         return self._ledger
+
+    def enable_contract_engine(self, contract_engine: Optional[ContractEngine] = None, database_url: str = "sqlite:///contracts.db") -> ContractEngine:
+        """Enable the contract engine for this server.
+        
+        Args:
+            contract_engine: Optional contract engine instance. If None, creates a new one.
+            database_url: Database URL for contract persistence
+            
+        Returns:
+            The contract engine instance
+        """
+        if contract_engine is None:
+            contract_engine = ContractEngine(database_url)
+        
+        self._contract_engine = contract_engine
+        logger.info("Contract engine enabled for server")
+        return contract_engine
+    
+    def get_contract_engine(self) -> Optional[ContractEngine]:
+        """Get the contract engine instance.
+        
+        Returns:
+            The contract engine instance, or None if not enabled
+        """
+        return self._contract_engine
 
     async def _mcp_list_tools(self) -> list[MCPTool]:
         logger.debug("Handler called: list_tools")
