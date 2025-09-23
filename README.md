@@ -7,12 +7,10 @@
 
 *Built for security-first organizations*
 
-[![Docs](https://img.shields.io/badge/docs-securemcp.com-blue)](https://securemcp.com)
-[![PyPI - Version](https://img.shields.io/pypi/v/securemcp.svg)](https://pypi.org/project/securemcp)
-[![Tests](https://github.com/securemcp/securemcp/actions/workflows/run-tests.yml/badge.svg)](https://github.com/securemcp/securemcp/actions/workflows/run-tests.yml)
-[![License](https://img.shields.io/github/license/securemcp/securemcp.svg)](https://github.com/securemcp/securemcp/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-purecipher.com-blue)](https://purecipher.com)
+[![License](https://img.shields.io/github/license/PureCipher/xsecuremcp.svg)](https://github.com/PureCipher/xsecuremcp/blob/main/LICENSE)
 
-<a href="https://trendshift.io/repositories/securemcp" target="_blank"><img src="https://trendshift.io/api/badge/repositories/securemcp" alt="securemcp%2Fsecuremcp | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/PureCipher/xsecuremcp" target="_blank"><img src="https://trendshift.io/api/badge/repositories/PureCipher/xsecuremcp" alt="PureCipher%2Fxsecuremcp | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
 
 > [!Note]
@@ -23,7 +21,7 @@
 >
 > SecureMCP provides **enterprise-grade security** with features including advanced authentication, authorization, audit logging, data encryption, compliance tools, and secure deployment patterns.
 >
-> Ready to secure your MCP infrastructure? Follow the [installation instructions](https://securemcp.com/getting-started/installation) to get started with SecureMCP.
+> Ready to secure your MCP infrastructure? Follow the [installation instructions](https://purecipher.com/getting-started/installation) to get started with SecureMCP.
 
 ---
 
@@ -60,14 +58,14 @@ securemcp run server.py
 
 ### 📚 Documentation
 
-SecureMCP's complete documentation is available at **[securemcp.com](https://securemcp.com)**, including detailed security guides, API references, and enterprise deployment patterns. This readme provides only a high-level overview.
+SecureMCP's complete documentation is available at **[purecipher.com](https://purecipher.com)**, including detailed security guides, API references, and enterprise deployment patterns. This readme provides only a high-level overview.
 
 Documentation is also available in [llms.txt format](https://llmstxt.org/), which is a simple markdown standard that LLMs can consume easily.
 
 There are two ways to access the LLM-friendly documentation:
 
-- [`llms.txt`](https://securemcp.com/llms.txt) is essentially a sitemap, listing all the pages in the documentation.
-- [`llms-full.txt`](https://securemcp.com/llms-full.txt) contains the entire documentation. Note this may exceed the context window of your LLM.
+- [`llms.txt`](https://purecipher.com/llms.txt) is essentially a sitemap, listing all the pages in the documentation.
+- [`llms-full.txt`](https://purecipher.com/llms-full.txt) contains the entire documentation. Note this may exceed the context window of your LLM.
 
 ---
 
@@ -178,7 +176,7 @@ We recommend installing SecureMCP with [uv](https://docs.astral.sh/uv/):
 uv pip install securemcp
 ```
 
-For full installation instructions, including verification, upgrading from [FastMCP](https://github.com/jlowin/fastmcp), and enterprise setup, see the [**Installation Guide**](https://securemcp.com/getting-started/installation).
+For full installation instructions, including verification, upgrading from [FastMCP](https://github.com/jlowin/fastmcp), and enterprise setup, see the [**Installation Guide**](https://purecipher.com/getting-started/installation).
 
 ## Core Concepts
 
@@ -197,7 +195,7 @@ mcp = SecureMCP(name="MySecureAssistant")
 mcp.auth_provider = JWTProvider(secret_key="your-secret-key")
 ```
 
-Learn more in the [**SecureMCP Server Documentation**](https://securemcp.com/servers/securemcp).
+Learn more in the [**SecureMCP Server Documentation**](https://purecipher.com/servers/securemcp).
 
 ### Tools
 
@@ -210,7 +208,7 @@ def multiply(a: float, b: float) -> float:
     return a * b
 ```
 
-Learn more in the [**Tools Documentation**](https://securemcp.com/servers/tools).
+Learn more in the [**Tools Documentation**](https://purecipher.com/servers/tools).
 
 ### Resources & Templates
 
@@ -229,7 +227,7 @@ def get_profile(user_id: int):
     return {"name": f"User {user_id}", "status": "active"}
 ```
 
-Learn more in the [**Resources & Templates Documentation**](https://securemcp.com/servers/resources).
+Learn more in the [**Resources & Templates Documentation**](https://purecipher.com/servers/resources).
 
 ### Prompts
 
@@ -242,7 +240,7 @@ def summarize_request(text: str) -> str:
     return f"Please summarize the following text:\n\n{text}"
 ```
 
-Learn more in the [**Prompts Documentation**](https://securemcp.com/servers/prompts).
+Learn more in the [**Prompts Documentation**](https://purecipher.com/servers/prompts).
 
 ### Context
 
@@ -281,7 +279,7 @@ async def process_data(uri: str, ctx: Context):
     return summary.text
 ```
 
-Learn more in the [**Context Documentation**](https://securemcp.com/servers/context).
+Learn more in the [**Context Documentation**](https://purecipher.com/servers/context).
 
 ### MCP Clients
 
@@ -352,7 +350,7 @@ async def main():
         answer = await client.call_tool("assistant_answer_question", {"query": "What is MCP?"})
 ```
 
-Learn more in the [**Client Documentation**](https://securemcp.com/clients/client) and [**Transports Documentation**](https://securemcp.com/clients/transports).
+Learn more in the [**Client Documentation**](https://purecipher.com/clients/client) and [**Transports Documentation**](https://purecipher.com/clients/transports).
 
 ## Advanced Features
 
@@ -362,19 +360,19 @@ SecureMCP introduces powerful ways to structure and deploy your secure MCP appli
 
 Create a SecureMCP server that acts as an intermediary for another local or remote MCP server using `SecureMCP.as_proxy()`. This is especially useful for bridging transports (e.g., remote SSE to local Stdio) or adding a security layer to a server you don't control.
 
-Learn more in the [**Proxying Documentation**](https://securemcp.com/patterns/proxy).
+Learn more in the [**Proxying Documentation**](https://purecipher.com/patterns/proxy).
 
 ### Composing MCP Servers
 
 Build modular applications by mounting multiple `SecureMCP` instances onto a parent server using `mcp.mount()` (live link) or `mcp.import_server()` (static copy). Each mounted server maintains its own security policies and access controls.
 
-Learn more in the [**Composition Documentation**](https://securemcp.com/patterns/composition).
+Learn more in the [**Composition Documentation**](https://purecipher.com/patterns/composition).
 
 ### OpenAPI & FastAPI Generation
 
 Automatically generate SecureMCP servers from existing OpenAPI specifications (`SecureMCP.from_openapi()`) or FastAPI applications (`SecureMCP.from_fastapi()`), instantly bringing your web APIs to the MCP ecosystem with built-in security controls.
 
-Learn more: [**OpenAPI Integration**](https://securemcp.com/integrations/openapi) | [**FastAPI Integration**](https://securemcp.com/integrations/fastapi).
+Learn more: [**OpenAPI Integration**](https://purecipher.com/integrations/openapi) | [**FastAPI Integration**](https://purecipher.com/integrations/fastapi).
 
 ### Authentication & Security
 
@@ -387,7 +385,7 @@ SecureMCP provides comprehensive enterprise-grade security features to secure bo
 - **Compliance Tools**: Built-in support for SOC2, HIPAA, and other compliance requirements
 - **Security Policies**: Configurable security policies and access controls
 
-Learn more in the **Authentication Documentation** for [servers](https://securemcp.com/servers/auth) and [clients](https://securemcp.com/clients/auth).
+Learn more in the **Authentication Documentation** for [servers](https://purecipher.com/servers/auth) and [clients](https://purecipher.com/clients/auth).
 
 ## Running Your Server
 
@@ -429,7 +427,7 @@ mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp", tls_cert="ce
 mcp.run(transport="sse", host="127.0.0.1", port=8000, require_auth=True)
 ```
 
-See the [**Running Server Documentation**](https://securemcp.com/deployment/running-server) for more details.
+See the [**Running Server Documentation**](https://purecipher.com/deployment/running-server) for more details.
 
 ## Contributing
 
@@ -445,8 +443,8 @@ Contributions are the core of open source! We welcome improvements and security 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/securemcp/securemcp.git 
-   cd securemcp
+   git clone https://github.com/PureCipher/xsecuremcp.git 
+   cd xsecuremcp
    ```
 
 2. Create and sync the environment:
@@ -500,6 +498,6 @@ uv run pre-commit run --all-files
 3. Make your changes, including tests and documentation updates.
 4. Ensure tests and pre-commit hooks pass.
 5. Commit your changes and push to your fork.
-6. Open a pull request against the `main` branch of `securemcp/securemcp`.
+6. Open a pull request against the `main` branch of `PureCipher/xsecuremcp`.
 
 Please open an issue or discussion for questions or suggestions before starting significant work!
